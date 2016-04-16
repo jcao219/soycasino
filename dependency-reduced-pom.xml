@@ -9,6 +9,12 @@
   <build>
     <resources>
       <resource>
+        <directory>data</directory>
+        <includes>
+          <include>**/*.db</include>
+        </includes>
+      </resource>
+      <resource>
         <directory>src/main/java/com/soycasino/res</directory>
         <includes>
           <include>**/*</include>
