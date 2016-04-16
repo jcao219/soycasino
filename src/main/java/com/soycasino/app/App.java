@@ -11,5 +11,10 @@ public class App
     public static void main( String[] args )
     {
         get("/hello", (req, res) -> "Hello World");
+        
+        get("/exit", (req, res) -> {
+            stop();
+            return "";
+        });
     }
 }
