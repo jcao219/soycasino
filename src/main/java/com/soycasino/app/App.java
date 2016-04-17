@@ -79,6 +79,16 @@ public class App
         serveStatic("/signup.html", false);
         
         serveStatic("/", "/login.html", false);
+        
+
+        /*get("/*", (q, a) -> {
+            throw new NotFoundException();
+        });
+
+        exception(NotFoundException.class, (e, request, response) -> {
+            response.status(404);
+            response.body("Not found :(");
+        });  -- Bug?!  Doesn't work, and there is no workaround. */
     }
 
     private static void serveStatic(String routePath, String servPath, boolean needLogin) {
