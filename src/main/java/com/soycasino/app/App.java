@@ -1,6 +1,7 @@
 package com.soycasino.app;
 
 import static spark.Spark.get;
+import static spark.Spark.exception;
 import static spark.Spark.post;
 
 import java.io.File;
@@ -124,7 +125,27 @@ public class App
     }
     
     public static String login(Request req, Response res) {
-        return req.queryParams("username");
+        Connection connection;
+        try {
+            System.out.println("DBPATH: " + db_path);
+            connection = DriverManager.getConnection("jdbc:sqlite:" + db_path);
+            PreparedStatement stmt = connection.prepareStatement("SELECT password,account FROM users WHERE email = ?");
+            stmt.setString(1, req.queryParams("username"));
+            ResultSet set = stmt.executeQuery();
+            String hashPass = hash(req.queryParams("password"));
+            while(set.next()) {
+                if(set.getString(1).equals(hashPass)) {
+                    res.cookie("_id", set.getString(2));
+                    connection.close();
+                    res.redirect("/lobby.html");
+                    return "Success!";
+                }
+            }
+            connection.close();
+            return "Login failed.";
+        } catch (Exception e1) {
+            return serverError(res, e1);
+        }
     }
     
     /**
@@ -167,21 +188,26 @@ public class App
         return Paths.get(jarFolder,resourceName).toString();
     }
     
+    static String db_path = jarPathOf("users.db");
+    
+    static {
+        File try_this_file = new File(db_path);
+        if(!try_this_file.exists()) {
+            try {
+                db_path = exportResource("/users.db");
+            } catch(Exception e) {
+                System.out.println("A serious startup exception occured.");
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static String signup(Request req, Response res) {
         List<String> required = Arrays.asList("first_name", "last_name", "email", "password");
         for(String s : required) {
             if(!req.queryParams().contains(s)) {
                 res.status(400);
                 return s + " is required.";
-            }
-        }
-        String db_path = jarPathOf("users.db");
-        File try_this_file = new File(db_path);
-        if(!try_this_file.exists()) {
-            try {
-                db_path = exportResource("/users.db");
-            } catch(Exception e) {
-                serverError(res, e);
             }
         }
         Connection connection;
