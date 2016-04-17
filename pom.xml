@@ -40,15 +40,16 @@
     </plugins>
 <resources>
       <resource>
-        <directory>data</directory>
+        <directory>.</directory>
         <includes>
-          <include>**/*.db</include>
+            <include>data/*.db</include>
         </includes>
       </resource>
       <resource>
-        <directory>src/main/java/com/soycasino/res</directory>
+        <directory>src/main/java/com/soycasino</directory>
         <includes>
-          <include>**/*</include>
+          <include>res/*</include>
+          <include>res/**/*</include>
         </includes>
       </resource>
     </resources>

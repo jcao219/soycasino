@@ -10,7 +10,6 @@ import org.eclipse.jetty.util.log.StdErrLog;
 
 import spark.Request;
 import spark.Response;
-import spark.Route;
 
 
 /**
@@ -24,7 +23,7 @@ public class App
         StdErrLog log = new StdErrLog();
         Log.setLog(log);
         log.setLevel(StdErrLog.LEVEL_WARN);
-        staticFileLocation("com/soycasino/res");
+        staticFileLocation("res");
 
         get("/hello", (req, res) -> "Hello World");
         post("/login", App::login);
