@@ -89,7 +89,6 @@ public class App
             try {
                 String resPath = Paths.get("/res", servPath).toString();
                 String result = readResource(resPath);
-                System.out.println("res: " + result);
                 return result;
             } catch (IOException e) {
                 e.printStackTrace();
