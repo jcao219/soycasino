@@ -5,6 +5,15 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 </head>
 <body>
+
+<form action="/updateAccounts" method="POST">
+<p>
+</p><fieldset><legend><strong>Accounts</strong></legend>
+<table border="1" cellspacing="0" cellpadding="5">
+<tbody id="genHere"></tbody></table>
+</fieldset>
+</form>
+
 <form action="/addAccount" method="post">
 <select name="type">
   <option value="Credit Card">Credit Card</option>
@@ -14,10 +23,15 @@
 <INPUT TYPE=TEXT SIZE=40 NAME="nickname" value="your name"><br>
 <INPUT TYPE=INT SIZE=40 NAME="deposit" value="deposit amount">
 
+
+
      <input type="submit" name="mysubmit" value="Submit"/>
      
-     
+     <input type="button" name="" id="refresh" value="Refresh"/>
   
 </form>
+
+<script src="/getAccounts.js"></script>
+
 </body>
 </html>
