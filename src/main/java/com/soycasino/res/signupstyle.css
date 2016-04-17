@@ -5,7 +5,7 @@ html, body {
     padding: 0;
 }
 
-body {
+.jumbotron {
 	background: linear-gradient(270deg, #18f0b8, #18a2f0, #db5640);
 	background-size: 300% 300%;
 	-webkit-animation: Gradient 3s ease infinite;
@@ -42,6 +42,35 @@ body {
 		right: 5px;
 		top: 0px;
 	}
+	#block{
+		position:absolute;
+		top:20px;
+		margin-left:auto;
+		margin-right:auto;
+		
+	}
+	
+	.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+	}
+	
+	#pic1 {
+	position: absolute;
+	top: 10px;
+	text-align:center;
+	 
+  }
+  	
+	#pic2 {
+	position: relative;
+	text-align:center;
+	  
+  }
+	
 	
 	
 	
