@@ -58,6 +58,24 @@ html, body {
 /*  align-items: center;
 /*	}
 	
+	#pic1 {
+	position: absolute;
+	top: 10px;
+	text-align:center;
+	float:center;
+	clear:center;
+
+      }
+  	
+	#pic2 {
+	position: relative;
+	text-align:center;
+	float:left;
+	clear:left;
+	display:inline-block;
+      }
+	
+	
 	
 	
 	
