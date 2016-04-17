@@ -83,7 +83,7 @@ public class App
         });
         post("/addAccount", App::addAccount);
         get("/getAccounts", App::getAccounts);
-        get("/updateAccounts", App::updateAccounts);
+        post("/updateAccounts", App::updateAccounts);
         
         //                     NEEDLOGIN
         serveStatic("/lobby.html", true);
