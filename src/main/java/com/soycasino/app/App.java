@@ -1,7 +1,6 @@
 package com.soycasino.app;
 
 import static spark.Spark.get;
-import static spark.Spark.exception;
 import static spark.Spark.post;
 
 import java.io.File;
@@ -19,8 +18,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.hc.client5.http.impl.sync.HttpClients;
 import org.apache.hc.client5.http.methods.HttpPost;
@@ -34,6 +32,7 @@ import org.eclipse.jetty.util.log.StdErrLog;
 
 import com.google.gson.Gson;
 import com.soycasino.json.Address;
+import com.soycasino.json.CreateAccountResult;
 import com.soycasino.json.CreateCustomer;
 import com.soycasino.json.CreateCustomerResult;
 
@@ -70,6 +69,16 @@ public class App
         get("/hello", (req, res) -> "Hello World");
         post("/login", App::login);
         post("/signup", App::signup);
+        get("/signout", (req, res) -> {
+          if(!verifyLoggedIn(req, res)) {
+              return "Redirect to login.";
+          }
+          res.removeCookie("_id");
+          res.redirect("/");
+          return "Signed out";
+        });
+        post("/addAccount", App::addAccount);
+        get("/getAccounts", App::getAccounts);
         
         //                     NEEDLOGIN
         serveStatic("/lobby.html", true);
@@ -77,6 +86,7 @@ public class App
         serveStatic("/blackjack.html", true);
         serveStatic("/poker.html", true);
         serveStatic("/signup.html", false);
+        serveStatic("/accounts.html", true);
         
         serveStatic("/", "/login.html", false);
         
@@ -90,14 +100,69 @@ public class App
             response.body("Not found :(");
         });  -- Bug?!  Doesn't work, and there is no workaround. */
     }
+    
+    static ApiCall api = new ApiCall(API_KEY);
+    
+    private static String addAccount(Request req, Response res) {
+        if(!verifyLoggedIn(req, res)) {
+            return "Not logged in.";
+        }
+        if(!validateParams(res, req.queryParams(), "type", "nickname", "deposit")) {
+            return "required param missing";
+        }
+        try {
+            CreateAccountResult car = api.createAccount(req.cookie("_id"),
+                req.queryParams("type"),
+                req.queryParams("nickname"), 0, 
+                Integer.parseInt(req.queryParams("deposit")),
+                "12345");
+            if(car == null) {
+                res.status(404);
+                return "Not found: null result.";
+            } else {
+                return "Result: " + car.code + " - msg=" + car.message + " field=" + car.fields;
+            }
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+    
+    private static String getAccounts(Request req, Response res) {
+        if(!verifyLoggedIn(req, res)) {
+            return "Not logged in.";
+        }
+        return "No account :(";
+    }
+
+    private static boolean validateParams(Response res, Set<String> queryParams, String... items) {
+        for(String s : items) {
+            if(!queryParams.contains(s)) {
+                res.status(400);
+                return false;
+            }
+        }
+        return true;
+        
+    }
+
+    private static boolean verifyLoggedIn(Request req, Response res) {
+        // VERY INSECURE
+        String cust_id = req.cookie("_id");
+        if(cust_id == null) {
+            res.redirect("/login.html");
+            return false;
+        }
+        return true;
+    }
 
     private static void serveStatic(String routePath, String servPath, boolean needLogin) {
         get(routePath, (res, req) -> {
             String cust_id = res.cookie("_id"); // customer id
             
-            if(cust_id == null && needLogin) {
-                req.redirect("/login.html");
-                return "Redirecting to login...";
+            if(needLogin) {
+                if(!verifyLoggedIn(res, req)) {
+                    return "Need to login...";
+                }
             } else if (cust_id != null && !needLogin) {
                 // TODO: validate it.
                 req.redirect("/lobby.html");
@@ -213,12 +278,8 @@ public class App
     }
 
     public static String signup(Request req, Response res) {
-        List<String> required = Arrays.asList("first_name", "last_name", "email", "password");
-        for(String s : required) {
-            if(!req.queryParams().contains(s)) {
-                res.status(400);
-                return s + " is required.";
-            }
+        if(!App.validateParams(res, req.queryParams(), "first_name", "last_name", "email", "password")) {
+            return "Required param missing.";
         }
         Connection connection;
         try {
