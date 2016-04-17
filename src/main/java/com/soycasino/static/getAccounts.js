@@ -1,19 +1,21 @@
 $(function() {
   $("#refresh").click(function(){
-  $.getJSON( "ajax/test.json", function( data ) {
+  console.log("somestring");
+    $.getJSON( "getAccounts", function( data ) {
+    
+    $("#genHere").empty();
   
-  for(i =0; data.length; i++){
-	console.log(data[i]);
-  }
-  
-  $.each( data, function( key, val ) {
-    items.push( "<li id='" + key + "'>" + val + "</li>" );
-  });
+	  for(i =0; i< data.length; i++){
+		console.log(data[i]);
+		var node ="<tr><td>\
+		<label><input type=\"RADIO\" name=\"acc_id\" checked=\"\" value=\""+ data[i]._id + "\">";
+		node = node + data[i].nickname + "</label></td>";
+        node = node + "<td>";
+		node = node + data[i].balance + "</td></tr>";
+
+       $("#genHere").append(node);
+	  }  
  
-  $( "<ul/>", {
-    "class": "accountsList",
-    html: items.join( "" )
-  }).appendTo( "body" );
-});
+    });
   });
 });
