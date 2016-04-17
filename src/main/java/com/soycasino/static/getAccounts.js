@@ -1,4 +1,21 @@
 $(function() {
+
+ $("#updateAccounts").click(function(){
+  console.log("somestring");
+    
+    $.post("/updateAccounts" , "acc_id="+ $('input[name=acc_id]:checked').val(), function(data){
+        $("#result").text(data);
+        console.log(data);
+    });
+    
+  
+  });
+
+
+
+
+
+
   $("#refresh").click(function(){
   console.log("somestring");
     $.getJSON( "getAccounts", function( data ) {

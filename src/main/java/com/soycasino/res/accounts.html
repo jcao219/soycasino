@@ -6,13 +6,15 @@
 </head>
 <body>
 
-<form action="/updateAccounts" method="POST">
+<form>
 <p>
 </p><fieldset><legend><strong>Accounts</strong></legend>
 <table border="1" cellspacing="0" cellpadding="5">
 <tbody id="genHere"></tbody></table>
 </fieldset>
 </form>
+
+<button type="submit" name="" id="updateAccounts" value="Update Accounts">Update Primary Account</button>
 
 <form action="/addAccount" method="post">
 <select name="type">
@@ -28,6 +30,11 @@
      <input type="submit" name="mysubmit" value="Submit"/>
      
      <input type="button" name="" id="refresh" value="Refresh"/>
+  
+  <div id="result">
+  
+  </div>
+  
   
 </form>
 
