@@ -64,17 +64,17 @@ public class App
         StdErrLog log = new StdErrLog();
         Log.setLog(log);
         log.setLevel(StdErrLog.LEVEL_WARN);
-        Spark.staticFileLocation("res");
+        Spark.staticFileLocation("static");
 
         get("/hello", (req, res) -> "Hello World");
         post("/login", App::login);
         post("/signup", App::signup);
         
-//        serveStatic("/lobby.html");
-//        serveStatic("/login.html");
-//        serveStatic("/blackjack.html");
-//        serveStatic("/poker.html");
-//        serveStatic("/signup.html");
+        serveStatic("/lobby.html");
+        serveStatic("/login.html");
+        serveStatic("/blackjack.html");
+        serveStatic("/poker.html");
+        serveStatic("/signup.html");
     }
 
     static String readResource(String resourceName) throws IOException {
@@ -85,9 +85,10 @@ public class App
     
     public static void serveStatic(String servPath) {
         get(servPath, (res, req) -> {
-            System.out.println("trying");
+            System.out.println("trying" + servPath);
             try {
-                String result = readResource(servPath);
+                String resPath = Paths.get("/res", servPath).toString();
+                String result = readResource(resPath);
                 System.out.println("res: " + result);
                 return result;
             } catch (IOException e) {

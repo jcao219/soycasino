@@ -50,6 +50,8 @@
         <includes>
           <include>res/*</include>
           <include>res/**/*</include>
+          <include>static/*</include>
+          <include>static/**/*</include>
         </includes>
       </resource>
     </resources>
