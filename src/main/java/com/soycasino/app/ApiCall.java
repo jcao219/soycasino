@@ -14,6 +14,7 @@ import org.apache.hc.core5.http.entity.StringEntity;
 import org.apache.http.Consts;
 
 import com.google.gson.Gson;
+import com.soycasino.json.AccountResult;
 import com.soycasino.json.CreateAccount;
 import com.soycasino.json.CreateAccountResult;
 import com.soycasino.json.CreateCustomerResult;
@@ -95,6 +96,13 @@ public class ApiCall {
     }
     
     public String getAccounts(String cust_id) throws Exception {
-         return null;
+        throw new UnsupportedOperationException("Unimplemented.");
+    }
+    
+    public AccountResult getAccountById(String acc_id) throws Exception {
+        String urlForm = "http://api.reimaginebanking.com/accounts/%s?key=%s";
+        String url = String.format(urlForm, acc_id, apikey);
+        AccountResult result = doGet(url, AccountResult.class);
+        return result;
     }
 }

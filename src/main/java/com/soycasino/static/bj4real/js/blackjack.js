@@ -18,43 +18,18 @@ function reset(){
 }
 
 
-function deal(){
+function deal(data){
+	$(".dealer-cards .card1").addClass(data.dealer1);
+	$(".dealer-cards .card1").removeClass('flipped');
+        $("#dealerTotal").html(data.dealer);
 
-	reset();
-				
-/// Store cards in array
-	var cards = ["ace-of-clubs","two-of-clubs","three-of-clubs","four-of-clubs","five-of-clubs","six-of-clubs","seven-of-clubs","eight-of-clubs","nine-of-clubs","ten-of-clubs","jack-of-clubs","queen-of-clubs","king-of-clubs","ace-of-spades","two-of-spades","three-of-spades","four-of-spades","five-of-spades","six-of-spades","seven-of-spades","eight-of-spades","nine-of-spades","ten-of-spades","jack-of-spades","queen-of-spades","king-of-spades","ace-of-hearts","two-of-hearts","three-of-hearts","four-of-hearts","five-of-hearts","six-of-hearts","seven-of-hearts","eight-of-hearts","nine-of-hearts","ten-of-hearts","jack-of-hearts","queen-of-hearts","king-of-hearts","ace-of-diamonds","two-of-diamonds","three-of-diamonds","four-of-diamonds","five-of-diamonds","six-of-diamonds","seven-of-diamonds","eight-of-diamonds","nine-of-diamonds","ten-of-diamonds","jack-of-diamonds","queen-of-diamonds","king-of-diamonds"];
-	
-	/// Store correlating values in an array
-	var values = [11,2,3,4,5,6,7,8,9,10,10,10,10,11,2,3,4,5,6,7,8,9,10,10,10,10,11,2,3,4,5,6,7,8,9,10,10,10,10,11,2,3,4,5,6,7,8,9,10,10,10,10];
-	
-	/// Zero out dealer total
-	var dealerTotal = 0;
-	$(".dealer-cards .card").each(function(){
+	$(".player-cards .card1").addClass(data.player1);
+	$(".player-cards .card1").removeClass('flipped');
+	$(".player-cards .card2").addClass(data.player2);
+	$(".player-cards .card2").removeClass('flipped');
+        $("#playerTotal").html(data.player);
+        return;
 		
-		var num = Math.floor(Math.random()*cards.length);
-		var cardClass = cards[num];
-		
-		$(this).addClass(cardClass);
-		
-		$(this).attr("data-value",values[num]);
-		
-		dealerTotal = parseInt(dealerTotal) + parseInt(values[num]);
-		
-		if(dealerTotal>21){
-			$(".dealer-cards .card").each(function(){
-				if($(this).attr("data-value")==11){
-					dealerTotal = parseInt(dealerTotal) - 10;
-					$(this).attr("data-value",1);
-				}
-			});
-		}
-		
-		$("#dealerTotal").html(dealerTotal);
-		
-		cards.splice(num, 1);
-		values.splice(num, 1);
-	});
 	
 	/// Zero out player total
 	var playerTotal = 0;
@@ -224,10 +199,17 @@ $(document).ready(function(){
         console.log("Doing game loop.");
         var gameLoop = function() {
             console.log("loop!");
-            $.getJSON("/gameInfo?game=bj4real", function(data) {
+            $.getJSON("/gameInfo/bj4real", function(data) {
                 console.log("money: " + data.balance);
+                $("#money").html("$" + data.balance);
+
+                if(data.gameState == "deal") {
+                    deal(data);
+                }
             });
         };
+
+        gameLoop();
        
         window.intrvl = setInterval(gameLoop, 3000);
 

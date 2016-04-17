@@ -40,6 +40,7 @@ import com.soycasino.json.Address;
 import com.soycasino.json.CreateAccountResult;
 import com.soycasino.json.CreateCustomer;
 import com.soycasino.json.CreateCustomerResult;
+import com.soycasino.spblackjack.SPBlackJack;
 
 import spark.Request;
 import spark.Response;
@@ -87,12 +88,13 @@ public class App
         get("/getAccounts", App::getAccounts);
         get("/startGame", App::startGame);
         post("/updateAccounts", App::updateAccounts);
+        SPBlackJack.registerRoutes();
         
         //                     NEEDLOGIN
         serveStatic("/lobby.html", true);
         serveStatic("/login.html", false);
-        serveStatic("/blackjack.html", true);
-        serveStatic("/bjack4real.html", true);
+        //serveStatic("/blackjack.html", true);
+        //serveStatic("/bjack4real.html", true);
         serveStatic("/poker.html", true);
         serveStatic("/signup.html", false);
         serveStatic("/accounts.html", true);
@@ -112,18 +114,22 @@ public class App
     
     public static final Map<String, Object> allGameStates = new ConcurrentHashMap<>();
     
+    public static boolean verifyHasAcc(Request req, Response res) {
+        return req.cookie("_acc") != null;
+    }
+    
     private static String startGame(Request req, Response res) {
         if(!verifyLoggedIn(req, res)) {
             return "not logged in";
         }
-        if(req.cookie("_acc") == null) { // TODO
+        if(!verifyHasAcc(req, res)) { // TODO
             return errorPage + "Need to select primary acc. in accounts page!";
         }
         if(req.queryParams("game") == null) {
             return errorPage + "need a game!";
         }
         if(req.queryParams("game").equals("bj4real")) {
-            allGameStates.put(req.cookie("_id"), new Object());
+            allGameStates.put(req.cookie("_id"), new com.soycasino.spblackjack.GameInfo());
             res.redirect("/bj4real/index.html");
             return "Redirecting...";
         } else {
@@ -171,7 +177,7 @@ public class App
         }
     }
     
-    static final String errorPage = "<!doctype html><title>Error</title> <a href=\"/lobby.html\">Back to lobby</a><br><p>";
+    public static final String errorPage = "<!doctype html><title>Error</title> <a href=\"/lobby.html\">Back to lobby</a><br><p>";
     
     static Map<String, LocalTime> throttleGetAccounts = new ConcurrentHashMap<>();
     private final static long SECONDS_THROTTLE = 10L; // how many seconds to force wait.
@@ -197,7 +203,7 @@ public class App
         }
     }
 
-    private static boolean validateParams(Response res, Set<String> queryParams, String... items) {
+    public static boolean validateParams(Response res, Set<String> queryParams, String... items) {
         for(String s : items) {
             if(!queryParams.contains(s)) {
                 res.status(400);
@@ -208,7 +214,7 @@ public class App
         
     }
 
-    private static boolean verifyLoggedIn(Request req, Response res) {
+    public static boolean verifyLoggedIn(Request req, Response res) {
         // VERY INSECURE
         String cust_id = req.cookie("_id");
         if(cust_id == null) {
@@ -430,5 +436,9 @@ public class App
         res.status(500);
         e.printStackTrace();
         return "An error has occurred";
+    }
+
+    public static double getFunds(String acc_id) throws Exception {
+        return api.getAccountById(acc_id).balance;
     }
 }
