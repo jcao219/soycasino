@@ -70,21 +70,29 @@ public class App
         post("/login", App::login);
         post("/signup", App::signup);
         
-        serveStatic("/lobby.html");
-        serveStatic("/login.html");
-        serveStatic("/blackjack.html");
-        serveStatic("/poker.html");
-        serveStatic("/signup.html");
+        //                     NEEDLOGIN
+        serveStatic("/lobby.html", true);
+        serveStatic("/login.html", false);
+        serveStatic("/blackjack.html", true);
+        serveStatic("/poker.html", true);
+        serveStatic("/signup.html", false);
+        
+        serveStatic("/", "/login.html", false);
     }
 
-    static String readResource(String resourceName) throws IOException {
-        InputStream stream = App.class.getResourceAsStream(resourceName);
-        System.out.println(resourceName);
-        return IOUtils.toString(stream);
-    }
-    
-    public static void serveStatic(String servPath) {
-        get(servPath, (res, req) -> {
+    private static void serveStatic(String routePath, String servPath, boolean needLogin) {
+        get(routePath, (res, req) -> {
+            String cust_id = res.cookie("_id"); // customer id
+            
+            if(cust_id == null && needLogin) {
+                req.redirect("/login.html");
+                return "Redirecting to login...";
+            } else if (cust_id != null && !needLogin) {
+                // TODO: validate it.
+                req.redirect("/lobby.html");
+                return "Redirecting to lobby...";
+            }
+            
             System.out.println("trying" + servPath);
             try {
                 String resPath = Paths.get("/res", servPath).toString();
@@ -97,7 +105,22 @@ public class App
                 e.printStackTrace();
                 return "noo";
             }
-        });
+        }); 
+    }
+
+    static String readResource(String resourceName) throws IOException {
+        InputStream stream = App.class.getResourceAsStream(resourceName);
+        System.out.println(resourceName);
+        return IOUtils.toString(stream);
+    }
+    
+    /**
+     * If needLogin is true: you need to be logged in to access this page.
+     * @param servPath
+     * @param needLogin
+     */
+    public static void serveStatic(String servPath, boolean needLogin) {
+        serveStatic(servPath, servPath, needLogin);
     }
     
     public static String login(Request req, Response res) {
