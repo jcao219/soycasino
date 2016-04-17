@@ -10,8 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -40,6 +38,7 @@ import com.soycasino.json.CreateCustomerResult;
 
 import spark.Request;
 import spark.Response;
+import spark.Spark;
 import spark.utils.IOUtils;
 
 /**
@@ -65,7 +64,7 @@ public class App
         StdErrLog log = new StdErrLog();
         Log.setLog(log);
         log.setLevel(StdErrLog.LEVEL_WARN);
-        staticFileLocation("res");
+        Spark.staticFileLocation("res");
 
         get("/hello", (req, res) -> "Hello World");
         post("/login", App::login);
