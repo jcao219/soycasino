@@ -2,8 +2,6 @@ package com.soycasino.app;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
-import static spark.Spark.staticFileLocation;
-import static spark.Spark.stop;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -70,9 +70,34 @@ public class App
         get("/hello", (req, res) -> "Hello World");
         post("/login", App::login);
         post("/signup", App::signup);
-        get("/exit", (req, res) -> {
-            stop();
-            return "";
+        
+//        serveStatic("/lobby.html");
+//        serveStatic("/login.html");
+//        serveStatic("/blackjack.html");
+//        serveStatic("/poker.html");
+//        serveStatic("/signup.html");
+    }
+
+    static String readResource(String resourceName) throws IOException {
+        InputStream stream = App.class.getResourceAsStream(resourceName);
+        System.out.println(resourceName);
+        return IOUtils.toString(stream);
+    }
+    
+    public static void serveStatic(String servPath) {
+        get(servPath, (res, req) -> {
+            System.out.println("trying");
+            try {
+                String result = readResource(servPath);
+                System.out.println("res: " + result);
+                return result;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return e.getMessage();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "noo";
+            }
         });
     }
     
@@ -202,6 +227,8 @@ public class App
         } catch (Exception e) {
             return serverError(res, e);
         }
+        res.cookie("_id", ccres.objectCreated._id);
+        res.redirect("/lobby.html");
         
         return "Successfully created account!";
     }
