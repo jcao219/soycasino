@@ -27,6 +27,7 @@ public class App
 
         get("/hello", (req, res) -> "Hello World");
         post("/login", App::login);
+        post("/signup", App::signup);
         get("/exit", (req, res) -> {
             stop();
             return "";
@@ -35,5 +36,9 @@ public class App
     
     public static String login(Request req, Response res) {
         return req.queryParams("username");
+    }
+    
+    public static String signup(Request req, Response res) {
+        return "Unimplemented.";
     }
 }
