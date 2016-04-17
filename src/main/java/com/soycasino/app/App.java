@@ -2,6 +2,7 @@ package com.soycasino.app;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.port;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,6 +66,7 @@ public class App
     
     public static void main( String[] args )
     {
+        port(80);
         StdErrLog log = new StdErrLog();
         Log.setLog(log);
         log.setLevel(StdErrLog.LEVEL_WARN);
@@ -83,12 +85,14 @@ public class App
         });
         post("/addAccount", App::addAccount);
         get("/getAccounts", App::getAccounts);
+        get("/startGame", App::startGame);
         post("/updateAccounts", App::updateAccounts);
         
         //                     NEEDLOGIN
         serveStatic("/lobby.html", true);
         serveStatic("/login.html", false);
         serveStatic("/blackjack.html", true);
+        serveStatic("/bjack4real.html", true);
         serveStatic("/poker.html", true);
         serveStatic("/signup.html", false);
         serveStatic("/accounts.html", true);
@@ -104,6 +108,27 @@ public class App
             response.status(404);
             response.body("Not found :(");
         });  -- Bug?!  Doesn't work, and there is no workaround. */
+    }
+    
+    public static final Map<String, Object> allGameStates = new ConcurrentHashMap<>();
+    
+    private static String startGame(Request req, Response res) {
+        if(!verifyLoggedIn(req, res)) {
+            return "not logged in";
+        }
+        if(req.cookie("_acc") == null) { // TODO
+            return errorPage + "Need to select primary acc. in accounts page!";
+        }
+        if(req.queryParams("game") == null) {
+            return errorPage + "need a game!";
+        }
+        if(req.queryParams("game").equals("bj4real")) {
+            allGameStates.put(req.cookie("_id"), new Object());
+            res.redirect("/bj4real/index.html");
+            return "Redirecting...";
+        } else {
+            return errorPage + "invalid game!";
+        }
     }
     
     private static String updateAccounts(Request req, Response res) {
@@ -238,6 +263,10 @@ public class App
     }
     
     public static String login(Request req, Response res) {
+        if(!validateParams(res, req.queryParams(), "username", "password")) {
+            res.redirect("/login.html");
+            return "Required param missing!";
+        }
         Connection connection;
         try {
             System.out.println("DBPATH: " + db_path);
