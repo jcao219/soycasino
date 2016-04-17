@@ -131,6 +131,7 @@ public class App
     }
     
     static Map<String, LocalTime> throttleGetAccounts = new ConcurrentHashMap<>();
+    private final static long MINUTE_THROTTLE = 0L;
     
     private static String getAccounts(Request req, Response res) {
         if(!verifyLoggedIn(req, res)) {
@@ -139,7 +140,7 @@ public class App
         String cust_id = req.cookie("_id");
         LocalTime lt;
         if((lt = throttleGetAccounts.getOrDefault(cust_id, null)) != null) {
-            if(ChronoUnit.MINUTES.between(lt, LocalTime.now()) < 1) {
+            if(ChronoUnit.MINUTES.between(lt, LocalTime.now()) < MINUTE_THROTTLE) {
                 res.status(403);
                 return "";
             }
