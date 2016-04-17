@@ -24,11 +24,11 @@ public class ApiCall {
 
     public ApiCall(String apikey) { this.apikey = apikey; }
     
-    public CreateAccountResult createAccount(String cust_id, String type, String nickname, int rewards, int balance, String acc_num) throws Exception {
+    public CreateAccountResult createAccount(String cust_id, String type, String nickname, int rewards, int balance) throws Exception {
         String URL = "http://api.reimaginebanking.com/customers/%s/accounts?key=%s";
         String req_url = String.format(URL, cust_id, apikey);
 
-        CreateAccount cacc = new CreateAccount(type, nickname, rewards, balance, acc_num);
+        CreateAccount cacc = new CreateAccount(type, nickname, rewards, balance, null);
         CreateAccountResult result = doPost(cacc, req_url, CreateAccountResult.class);
         return result;
     }

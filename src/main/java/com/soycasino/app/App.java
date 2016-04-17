@@ -114,8 +114,7 @@ public class App
             CreateAccountResult car = api.createAccount(req.cookie("_id"),
                 req.queryParams("type"),
                 req.queryParams("nickname"), 0, 
-                Integer.parseInt(req.queryParams("deposit")),
-                "12345");
+                Integer.parseInt(req.queryParams("deposit")));
             if(car == null) {
                 res.status(404);
                 return "Not found: null result.";
