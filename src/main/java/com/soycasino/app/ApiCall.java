@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import org.apache.hc.client5.http.impl.sync.HttpClients;
 import org.apache.hc.client5.http.methods.HttpPost;
+import org.apache.hc.client5.http.methods.HttpGet;
 import org.apache.hc.client5.http.sync.HttpClient;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpResponse;
@@ -60,5 +61,20 @@ public class ApiCall {
         }
         
         return ccres == null ? null : (U)ccres;
+    }
+
+    public String getAccounts(String cust_id) throws IOException {
+        String URL = "http://api.reimaginebanking.com/customers/%s/accounts?key=%s";
+        String req_url = String.format(URL, cust_id, apikey);
+        
+        HttpClient cli = HttpClients.createDefault();
+        HttpGet mtd = new HttpGet(req_url);
+        HttpResponse hresp = cli.execute(mtd);
+        HttpEntity ent = hresp.getEntity();
+        if(ent != null) {
+            return IOUtils.toString(hresp.getEntity().getContent());
+        } else {
+            throw new IOException("Null entity.");
+        }
     }
 }

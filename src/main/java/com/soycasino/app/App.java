@@ -18,7 +18,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.hc.client5.http.impl.sync.HttpClients;
 import org.apache.hc.client5.http.methods.HttpPost;
@@ -126,11 +130,27 @@ public class App
         }
     }
     
+    static Map<String, LocalTime> throttleGetAccounts = new ConcurrentHashMap<>();
+    
     private static String getAccounts(Request req, Response res) {
         if(!verifyLoggedIn(req, res)) {
             return "Not logged in.";
         }
-        return "No account :(";
+        String cust_id = req.cookie("_id");
+        LocalTime lt;
+        if((lt = throttleGetAccounts.getOrDefault(cust_id, null)) != null) {
+            if(ChronoUnit.MINUTES.between(lt, LocalTime.now()) < 1) {
+                res.status(403);
+                return "";
+            }
+        }
+        try {
+            String rs = api.getAccounts(cust_id);
+            throttleGetAccounts.put(cust_id, LocalTime.now());
+            return rs;
+        } catch (IOException e) {
+            return serverError(res, e);
+        }
     }
 
     private static boolean validateParams(Response res, Set<String> queryParams, String... items) {
