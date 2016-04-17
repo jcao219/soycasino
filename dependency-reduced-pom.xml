@@ -9,9 +9,9 @@
   <build>
     <resources>
       <resource>
-        <directory>.</directory>
+        <directory>data</directory>
         <includes>
-          <include>data/*.db</include>
+          <include>*.db</include>
         </includes>
       </resource>
       <resource>
