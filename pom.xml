@@ -40,9 +40,9 @@
     </plugins>
 <resources>
       <resource>
-        <directory>.</directory>
+        <directory>data</directory>
         <includes>
-            <include>data/*.db</include>
+            <include>*.db</include>
         </includes>
       </resource>
       <resource>
@@ -57,6 +57,21 @@
 
   <url>http://maven.apache.org</url>
   <dependencies>
+<dependency>
+  <groupId>org.apache.httpcomponents</groupId>
+  <artifactId>httpcore</artifactId>
+  <version>4.4.4</version>
+</dependency>
+     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.4</version>
+    </dependency> 
+     <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
+      <version>5.0-alpha1</version>
+    </dependency> 
    <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
@@ -72,6 +87,12 @@
         <groupId>com.sparkjava</groupId>
         <artifactId>spark-core</artifactId>
         <version>2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.6.2</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
