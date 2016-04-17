@@ -113,7 +113,8 @@ public class App
         if(!validateParams(res, req.queryParams(), "acc_id")) {
             return "Nothing updated.";
         }
-        return "Unimplemented.";
+        res.cookie("_acc", req.queryParams("acc_id"));
+        return "Updated account number.";
     }
     
     static ApiCall api = new ApiCall(API_KEY);
