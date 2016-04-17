@@ -83,6 +83,7 @@ public class App
         });
         post("/addAccount", App::addAccount);
         get("/getAccounts", App::getAccounts);
+        get("/updateAccounts", App::updateAccounts);
         
         //                     NEEDLOGIN
         serveStatic("/lobby.html", true);
@@ -105,6 +106,16 @@ public class App
         });  -- Bug?!  Doesn't work, and there is no workaround. */
     }
     
+    private static String updateAccounts(Request req, Response res) {
+        if(!verifyLoggedIn(req, res)) {
+            return "not logged in.";
+        }
+        if(!validateParams(res, req.queryParams(), "acc_id")) {
+            return "Nothing updated.";
+        }
+        return "Unimplemented.";
+    }
+    
     static ApiCall api = new ApiCall(API_KEY);
     
     private static String addAccount(Request req, Response res) {
@@ -122,16 +133,22 @@ public class App
             if(car == null) {
                 res.status(404);
                 return "Not found: null result.";
+            } else if(car.code != 201) {
+                return errorPage + car.message; 
             } else {
-                return "Result: " + car.code + " - msg=" + car.message + " field=" + car.fields;
+                res.redirect("/accounts.html");
+                res.status(200);
+                return "Done!";
             }
         } catch (Exception e) {
-            return e.getMessage();
+            return errorPage + e.getMessage();
         }
     }
     
+    static final String errorPage = "<!doctype html><title>Error</title> <a href=\"/lobby.html\">Back to lobby</a><br><p>";
+    
     static Map<String, LocalTime> throttleGetAccounts = new ConcurrentHashMap<>();
-    private final static long MINUTE_THROTTLE = 0L;
+    private final static long SECONDS_THROTTLE = 10L; // how many seconds to force wait.
     
     private static String getAccounts(Request req, Response res) {
         if(!verifyLoggedIn(req, res)) {
@@ -140,13 +157,13 @@ public class App
         String cust_id = req.cookie("_id");
         LocalTime lt;
         if((lt = throttleGetAccounts.getOrDefault(cust_id, null)) != null) {
-            if(ChronoUnit.MINUTES.between(lt, LocalTime.now()) < MINUTE_THROTTLE) {
+            if(ChronoUnit.SECONDS.between(lt, LocalTime.now()) < SECONDS_THROTTLE) {
                 res.status(403);
                 return "";
             }
         }
         try {
-            String rs = api.getAccounts(cust_id);
+            String rs = api.getAccountsJson(cust_id);
             throttleGetAccounts.put(cust_id, LocalTime.now());
             return rs;
         } catch (IOException e) {

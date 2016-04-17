@@ -63,7 +63,7 @@ public class ApiCall {
         return ccres == null ? null : (U)ccres;
     }
 
-    public String getAccounts(String cust_id) throws IOException {
+    public String getAccountsJson(String cust_id) throws IOException {
         String URL = "http://api.reimaginebanking.com/customers/%s/accounts?key=%s";
         String req_url = String.format(URL, cust_id, apikey);
         
@@ -76,5 +76,25 @@ public class ApiCall {
         } else {
             throw new IOException("Null entity.");
         }
+    }
+    
+    public <U> U doGet(String url, Class<U> result) throws IOException {
+        Gson gson = new Gson();
+        HttpClient cli = HttpClients.createDefault();
+        HttpGet mtd = new HttpGet(url);
+        HttpResponse hresp = cli.execute(mtd);
+        HttpEntity ent = hresp.getEntity();
+        Object ccres = null;
+        if(ent != null) {
+            ccres = gson.fromJson(new InputStreamReader(hresp.getEntity().getContent()), result);
+        } else {
+            throw new IOException("Null entity.");
+        }
+        
+        return ccres == null ? null : (U)ccres;
+    }
+    
+    public String getAccounts(String cust_id) throws Exception {
+         return null;
     }
 }
